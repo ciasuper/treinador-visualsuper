@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Treinador IA - Visual Super (SDR WhatsApp)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#1d4ed8',
+              600: '#1e40af',
+              700: '#1d3557',
+              accent: '#e63946',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans antialiased">
+
+  <!-- TOAST DE NOTIFICAÇÃO -->
+  <div id="toastGlobal" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-5 py-3.5 rounded-xl shadow-2xl transition-all duration-300 transform translate-y-4 opacity-0 pointer-events-none flex items-center gap-3 text-sm font-medium border border-slate-700">
+    <i class="fas fa-check-circle text-emerald-400 text-lg"></i>
+    <span>Notificação</span>
+  </div>
+
+  <!-- HEADER NAVEGAÇÃO -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo / Título -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 to-blue-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+            <i class="fas fa-brain text-xl"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-base font-bold text-slate-900 tracking-tight">Super Treinador SDR</h1>
+              <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">Visual Super</span>
+            </div>
+            <p class="text-xs text-slate-500">Treinamento Interativo de WhatsApp com 5 Alternativas & Feedback com Like</p>
+          </div>
+        </div>
+
+        <!-- Métricas Rápidas no Header -->
+        <div class="hidden md:flex items-center gap-4 text-sm">
+          <!-- Botão Chave Gemini AI -->
+          <button onclick="abrirModalConfigIA()" id="btnConfigIaHeader" class="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-3.5 py-1.5 rounded-xl font-bold text-xs shadow-md shadow-blue-500/20 transition cursor-pointer border border-blue-400/30">
+            <i class="fas fa-key text-amber-300"></i>
+            <span id="labelStatusIa">Chave Gemini IA</span>
+            <span id="badgeIaHeader" class="text-[10px] px-2 py-0.5 rounded-full bg-white/20 text-white font-mono">Configurar</span>
+          </button>
+
+          <div id="badgeStatusCrm" class="flex items-center">
+            <!-- Preenchido via JS com status do MCP -->
+          </div>
+          <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
+            <i class="fas fa-thumbs-up text-emerald-600"></i>
+            <div>
+              <span class="text-xs text-slate-400 block leading-none">Aprendizados com Like</span>
+              <span id="statTotalAprendizados" class="font-bold text-slate-800 text-sm">0</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
+            <i class="fas fa-store text-blue-600"></i>
+            <div>
+              <span class="text-xs text-slate-400 block leading-none">Setores Mapeados</span>
+              <span id="statTotalSetores" class="font-bold text-slate-800 text-sm">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Abas Principais -->
+      <nav class="flex space-x-6 sm:space-x-8 -mb-px overflow-x-auto">
+        <button onclick="alternarAbaPrincipal('simulador')" id="tabBtn-simulador" class="tab-principal py-3 px-1 border-b-2 border-blue-600 font-bold text-blue-600 text-sm flex items-center gap-2 transition shrink-0">
+          <i class="fas fa-comments"></i> 1. Simulador & 5 Alternativas
+        </button>
+        <button onclick="alternarAbaPrincipal('historico')" id="tabBtn-historico" class="tab-principal py-3 px-1 border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-700 text-sm flex items-center gap-2 transition shrink-0">
+          <i class="fas fa-database"></i> 2. Cérebro & Histórico com Like
+        </button>
+        <button onclick="alternarAbaPrincipal('exportador')" id="tabBtn-exportador" class="tab-principal py-3 px-1 border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-700 text-sm flex items-center gap-2 transition shrink-0">
+          <i class="fas fa-file-export"></i> 3. Gerador das Abas do CRM
+        </button>
+        <button onclick="alternarAbaPrincipal('catalogo')" id="tabBtn-catalogo" class="tab-principal py-3 px-1 border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-700 text-sm flex items-center gap-2 transition shrink-0">
+          <i class="fas fa-tags"></i> 4. Catálogo Oficial Visual Super
+          <span id="badgeContadorCatalogoHeader" class="px-2 py-0.5 rounded-full text-[10px] bg-blue-100 text-blue-800 font-bold font-mono">328</span>
+        </button>
+        <button onclick="alternarAbaPrincipal('crm')" id="tabBtn-crm" class="tab-principal py-3 px-1 border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-700 text-sm flex items-center gap-2 transition shrink-0">
+          <i class="fas fa-tower-broadcast text-emerald-600"></i> 5. Conexão CRM Live (MCP)
+        </button>
+        <button onclick="alternarAbaPrincipal('chat')" id="tabBtn-chat" class="tab-principal py-3 px-1 border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-700 text-sm flex items-center gap-2 transition shrink-0">
+          <i class="fas fa-comments text-indigo-600"></i> 6. Chat de Teste (Lead x SDR)
+        </button>
+        <button onclick="alternarAbaPrincipal('configuracoes')" id="tabBtn-configuracoes" class="tab-principal py-3 px-1 border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-700 text-sm flex items-center gap-2 transition shrink-0">
+          <i class="fas fa-sliders text-blue-600"></i> 7. Configurações & Varredura Web
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+
+    <!-- ========================================== -->
+    <!-- ABA 1: SIMULADOR & 5 ALTERNATIVAS COM LIKE -->
+    <!-- ========================================== -->
+    <section id="secao-simulador" class="space-y-6">
+      
+      <!-- Banner Status da IA Gemini -->
+      <div id="bannerStatusIa" class="rounded-2xl p-4 border transition flex flex-col md:flex-row items-start md:items-center justify-between gap-3 bg-gradient-to-r from-blue-50 via-indigo-50 to-slate-50 border-blue-200 shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center text-lg shadow-sm">
+            <i class="fas fa-brain"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span id="tituloStatusIa" class="font-bold text-sm text-slate-800">Motor de IA: Base Local Ativo</span>
+              <span id="pillStatusIa" class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">Sem Chave</span>
+            </div>
+            <p id="descStatusIa" class="text-xs text-slate-600 mt-0.5">Adicione sua chave de API Gemini (a mesma do CRM) para gerar 5 alternativas dinâmicas, profundas e personalizadas para cada lead.</p>
+          </div>
+        </div>
+        <button onclick="abrirModalConfigIA()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition flex items-center gap-2 shadow-sm whitespace-nowrap self-stretch md:self-auto justify-center cursor-pointer">
+          <i class="fas fa-key text-amber-300"></i>
+          <span id="btnBannerIaTexto">Configurar Chave da IA</span>
+        </button>
+      </div>
+
+      <!-- Card Superior: Pergunta do Lead -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-3">
+          <label for="inputPerguntaLead" class="text-sm font-bold text-slate-800 flex items-center gap-2">
+            <i class="fas fa-user-tag text-blue-600"></i>
+            Mensagem / Dúvida enviada pelo Lead (WhatsApp):
+          </label>
+          <span class="text-xs text-slate-400">O que o dono do supermercado ou hortifrúti perguntou?</span>
+        </div>
+
+        <div class="flex gap-3">
+          <textarea id="inputPerguntaLead" rows="2" placeholder="Ex.: Quero uma solução para precificar meu açougue, o papel molha todo dia no balcão e fica horrível..." class="w-full text-sm rounded-xl border border-slate-300 p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"></textarea>
+          <button onclick="acionarGerador()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-xl transition flex items-center gap-2 text-sm shadow-md shadow-blue-600/20 whitespace-nowrap self-stretch cursor-pointer">
+            <i class="fas fa-wand-magic-sparkles"></i>
+            Gerar 5 Alternativas
+          </button>
+        </div>
+
+        <!-- Campo: Link do Produto Real Consultado pelo Lead (Pesquisa & Aprendizado por IA) -->
+        <div class="mt-4 p-3.5 bg-gradient-to-r from-blue-50/80 to-indigo-50/60 rounded-xl border border-blue-200/90 shadow-2xs">
+          <div class="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
+            <label for="inputLinkProdutoLead" class="text-xs font-bold text-blue-950 flex items-center gap-1.5">
+              <i class="fas fa-link text-blue-600"></i>
+              Link do Produto Real Consultado pelo Lead (Pesquisa & Aprendizado Profundo da IA):
+            </label>
+            <span class="text-[11px] text-blue-700 font-medium">A IA lê a página do site, aprende o material e especificações</span>
+          </div>
+
+          <div class="flex gap-2">
+            <div class="relative flex-1">
+              <input type="url" id="inputLinkProdutoLead" placeholder="Cole aqui o link do produto no site da Visual Super (ex: https://visualsuper.com.br/produto/...)" class="w-full text-xs font-mono rounded-xl border border-blue-300 bg-white p-2.5 pl-8 focus:ring-2 focus:ring-blue-500 outline-none transition text-slate-800">
+              <i class="fas fa-globe absolute left-2.5 top-3 text-blue-400 text-xs"></i>
+            </div>
+            <button type="button" id="btnAprenderLinkProduto" onclick="app.acionarAprendizadoLink()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-1.5 text-xs shadow-sm whitespace-nowrap cursor-pointer">
+              <i class="fas fa-brain"></i>
+              <span id="btnAprenderLinkTexto">Pesquisar & Aprender Produto</span>
+            </button>
+            <button type="button" id="btnLimparLinkProduto" onclick="app.limparProdutoConsultado()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-3 py-2.5 rounded-xl transition text-xs border border-slate-300 hidden cursor-pointer" title="Remover produto aprendido">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
+          <!-- Campo de Observações do Consultor para a IA -->
+          <div class="mt-3 pt-2.5 border-t border-blue-200/60">
+            <div class="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
+              <label for="inputObservacaoProdutoLead" class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <i class="fas fa-clipboard-list text-indigo-600"></i>
+                Observações do Consultor para a IA (Relação entre o pedido do lead e o produto do link):
+              </label>
+              <span class="text-[10px] text-indigo-700 bg-indigo-50 font-semibold px-2 py-0.5 rounded border border-indigo-200">
+                A IA usará estas orientações para refinar as 5 alternativas
+              </span>
+            </div>
+            <textarea id="inputObservacaoProdutoLead" rows="2" placeholder="Ex.: O cliente pediu fita de 24 posições, mas no link temos a de 13 posições pronta entrega. Avise que temos a de 13 un para envio imediato e fabricamos a de 24 un sob encomenda (mínimo 100 unidades). Destaque que a testeira é personalizável com o logotipo dele." class="w-full text-xs rounded-xl border border-blue-200 bg-white p-2.5 focus:ring-2 focus:ring-blue-500 outline-none transition text-slate-800 placeholder-slate-400"></textarea>
+            
+            <!-- Sugestões de observações rápidas -->
+            <div class="mt-1.5 flex items-center gap-1.5 flex-wrap">
+              <span class="text-[10px] text-slate-500 font-semibold">Sugestões de observações:</span>
+              <button type="button" onclick="app.inserirSugestaoObservacao('Temos o modelo de 13 posições para pronta-entrega imediata e fornecemos o de 24 posições sob medida (mínimo 100 unidades).')" class="text-[10px] bg-white hover:bg-blue-50 text-slate-700 px-2 py-0.5 rounded border border-slate-200 transition">
+                ⚡ 13 un pronta entrega vs 24 un encomenda
+              </button>
+              <button type="button" onclick="app.inserirSugestaoObservacao('A testeira do clip strip pode ser totalmente personalizada com o logotipo e a identidade visual da sua marca.')" class="text-[10px] bg-white hover:bg-blue-50 text-slate-700 px-2 py-0.5 rounded border border-slate-200 transition">
+                🎨 Testeira personalizada com logotipo
+              </button>
+              <button type="button" onclick="app.inserirSugestaoObservacao('Condição especial e desconto progressivo para pedidos fechados em lote de 50 ou 100 unidades.')" class="text-[10px] bg-white hover:bg-blue-50 text-slate-700 px-2 py-0.5 rounded border border-slate-200 transition">
+                📦 Desconto especial em lote de 100 un
+              </button>
+            </div>
+          </div>
+
+          <!-- Card de Produto Aprendido em Tempo Real -->
+          <div id="cardProdutoAprendido" class="hidden mt-3 p-3.5 bg-white rounded-xl border border-emerald-300 shadow-sm transition-all">
+            <!-- Renderizado dinamicamente via JS -->
+          </div>
+        </div>
+
+        <!-- Atalhos de Perguntas Frequentes Rápidas -->
+        <div class="mt-4 pt-4 border-t border-slate-100 flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-semibold text-slate-400">Dúvidas rápidas de teste:</span>
+          <button onclick="carregarExemploClipStrip()" class="text-xs bg-amber-50 hover:bg-amber-100 text-amber-900 px-2.5 py-1 rounded-full transition border border-amber-300 font-bold flex items-center gap-1">
+            📌 Clip Strip / Fita Cross 24 Posições
+          </button>
+          <button onclick="carregarExemploRapido('como precificar caixas e bancas de hortifruti sem rasgar no molhado?')" class="text-xs bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-600 px-2.5 py-1 rounded-full transition border border-slate-200">
+            🍉 Hortifrúti e Água
+          </button>
+          <button onclick="carregarExemploRapido('como funciona o painel de precos para acougue com imas?')" class="text-xs bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-600 px-2.5 py-1 rounded-full transition border border-slate-200">
+            🥩 Painel Açougue ACM
+          </button>
+          <button onclick="carregarExemploRapido('gasto mais de 800 reais de cartazista e papel todo mes, vale a pena o reutilizavel?')" class="text-xs bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-600 px-2.5 py-1 rounded-full transition border border-slate-200">
+            💰 Custo de Cartazista
+          </button>
+          <button onclick="carregarExemploRapido('quero pedestais para ponta de gondola para colocar oferta A4')" class="text-xs bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-600 px-2.5 py-1 rounded-full transition border border-slate-200">
+            🏷️ Pedestal A4 Ponta de Gôndola
+          </button>
+          <button onclick="carregarExemploRapido('preciso de orcamento para montar loja inteira com CNPJ faturado')" class="text-xs bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-600 px-2.5 py-1 rounded-full transition border border-slate-200">
+            🤝 Loja Completa / Joelson
+          </button>
+        </div>
+      </div>
+
+      <!-- Grid com as 5 Alternativas Geradas -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div id="containerAlternativas">
+          <!-- Renderizado dinamicamente via JS -->
+        </div>
+
+        <!-- Opção 6: Resposta Customizada -->
+        <div class="mt-6 pt-6 border-t border-slate-200">
+          <label for="inputRespostaCustom" class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2 mb-2">
+            <i class="fas fa-pen-to-square text-amber-500"></i>
+            Opção 6: Nenhuma das 5 ficou 100%? Digite sua resposta ideal abaixo:
+          </label>
+          <textarea id="inputRespostaCustom" rows="3" placeholder="Digite aqui como você quer que o SDR responda exatamente a essa dúvida... Ao dar Like, essa sua versão personalizada será gravada no cérebro com prioridade máxima!" class="w-full text-xs text-slate-800 rounded-xl border border-slate-300 p-3 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition bg-amber-50/20"></textarea>
+        </div>
+
+        <!-- Botão Principal de Treinamento com LIKE -->
+        <div class="mt-6 flex items-center justify-between pt-4 border-t border-slate-100">
+          <div class="flex items-center gap-2 text-xs text-slate-500">
+            <i class="fas fa-shield-halved text-emerald-500"></i>
+            <span>Ao dar <strong>Like</strong>, o aprendizado é gravado no banco de dados e alimenta os arquivos das abas do CRM.</span>
+          </div>
+          <button onclick="app.salvarRespostaComLike(document.getElementById('inputRespostaCustom').value)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-3.5 rounded-xl transition flex items-center gap-2 text-sm shadow-lg shadow-emerald-600/30">
+            <i class="fas fa-thumbs-up text-base"></i>
+            Aprovar Resposta com LIKE e Gravar no Cérebro
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ========================================== -->
+    <!-- ABA 2: CÉREBRO & HISTÓRICO DE APRENDIZADOS -->
+    <!-- ========================================== -->
+    <section id="secao-historico" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <i class="fas fa-database text-blue-600"></i>
+              Histórico de Dúvidas e Respostas Aprovadas com LIKE
+            </h2>
+            <p class="text-xs text-slate-500">Essas perguntas e respostas já estão validadas e prontas para uso do SDR em situações semelhantes.</p>
+          </div>
+
+          <!-- Filtros, Busca e Reset de Memória -->
+          <div class="flex items-center gap-2 w-full sm:w-auto flex-wrap">
+            <button type="button" onclick="app.resetarMemoriaAprendizados()" class="text-xs bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 cursor-pointer shrink-0" title="Reseta o histórico da memória e recarrega os aprendizados e diretrizes oficiais atualizadas">
+              <i class="fas fa-arrows-rotate text-[11px]"></i> Resetar Memória
+            </button>
+            <select id="filtroSetorHistorico" onchange="aplicarFiltroHistorico()" class="text-xs rounded-xl border border-slate-300 px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+              <option value="todos">Todos os Setores</option>
+              <option value="Hortifrúti / FLV">Hortifrúti / FLV</option>
+              <option value="Açougue e Peixaria">Açougue e Peixaria</option>
+              <option value="Gôndolas e Prateleiras">Gôndolas e Prateleiras</option>
+              <option value="Entrada e Ponta de Gôndola">Entrada e Ponta de Gôndola</option>
+              <option value="Corporativo / Handoff">Corporativo / Handoff</option>
+              <option value="Objeção / Custos">Objeção / Custos</option>
+            </select>
+            <input type="text" id="buscaHistorico" onkeyup="aplicarFiltroHistorico()" placeholder="Buscar pergunta ou termo..." class="text-xs rounded-xl border border-slate-300 px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-56">
+          </div>
+        </div>
+
+        <!-- Tabela / Cards de Aprendizados -->
+        <div id="tabelaHistoricoAprendizados" class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/50">
+          <!-- Renderizado dinamicamente via JS -->
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ========================================== -->
+    <!-- ABA 3: EXPORTADOR PARA AS ABAS DO CRM      -->
+    <!-- ========================================== -->
+    <section id="secao-exportador" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <i class="fas fa-file-export text-blue-600"></i>
+              Exportador Automático para as Abas do Agente
+            </h2>
+            <p class="text-xs text-slate-500">O sistema compila todo o histórico de aprendizado nas estruturas exatas de cada aba do seu CRM.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="app.copiarExportacao()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-sm">
+              <i class="far fa-copy"></i> Copiar Conteúdo
+            </button>
+            <button id="btnDownloadExport" onclick="app.baixarExportacao()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-sm">
+              <i class="fas fa-download"></i> Baixar Arquivo
+            </button>
+          </div>
+        </div>
+
+        <!-- Seletor de Sub-Abas do CRM -->
+        <div class="flex border-b border-slate-200 mb-4 gap-2">
+          <button onclick="app.mudarAbaExport('treinamento')" id="subaba-treinamento" class="btn-subaba-export py-2.5 px-4 text-xs font-bold border-b-2 border-blue-600 text-blue-600 flex items-center gap-1.5 transition">
+            <i class="fas fa-book"></i> Aba Treinamento (Chunks & FAQ c/ Like)
+          </button>
+          <button onclick="app.mudarAbaExport('guardrails')" id="subaba-guardrails" class="btn-subaba-export py-2.5 px-4 text-xs font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 flex items-center gap-1.5 transition">
+            <i class="fas fa-ban"></i> Aba Guardrails (Proibições)
+          </button>
+          <button onclick="app.mudarAbaExport('cerebro')" id="subaba-cerebro" class="btn-subaba-export py-2.5 px-4 text-xs font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 flex items-center gap-1.5 transition">
+            <i class="fas fa-brain"></i> Aba Cérebro (Few-Shots)
+          </button>
+          <button onclick="app.mudarAbaExport('configuracao')" id="subaba-configuracao" class="btn-subaba-export py-2.5 px-4 text-xs font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 flex items-center gap-1.5 transition">
+            <i class="fas fa-sliders"></i> Aba Configuração (System Prompt)
+          </button>
+          <button onclick="app.mudarAbaExport('produtos')" id="subaba-produtos" class="btn-subaba-export py-2.5 px-4 text-xs font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 flex items-center gap-1.5 transition">
+            <i class="fas fa-tags"></i> Aba Produtos (CSV Catálogo)
+          </button>
+        </div>
+
+        <!-- Área de Código / Texto Gerado com Alto Contraste -->
+        <div class="relative">
+          <textarea id="conteudoAbaExportada" rows="18" readonly class="w-full font-mono text-xs text-emerald-300 bg-slate-950 p-4 rounded-xl border border-slate-800 outline-none leading-relaxed shadow-inner selection:bg-emerald-600 selection:text-white"></textarea>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ========================================== -->
+    <!-- ABA 4: CATÁLOGO DE PRODUTOS OFICIAL        -->
+    <!-- ========================================== -->
+    <section id="secao-catalogo" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <i class="fas fa-boxes-stacked text-blue-600"></i>
+              Catálogo Oficial Visual Super & Cadastro de Links Permanentes
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Links permanentes reais oficiais do e-commerce / CRM integrados ao motor de IA (sem URLs sintéticas ou inventadas).</p>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button onclick="app.abrirModalNovoProduto()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm cursor-pointer">
+              <i class="fas fa-plus"></i> Novo Produto
+            </button>
+            <button onclick="app.restaurarProdutosPadrao()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 border border-slate-300 cursor-pointer" title="Restaura os links permanentes oficiais de fábrica">
+              <i class="fas fa-rotate-left"></i> Restaurar Padrões
+            </button>
+            <a href="https://visualsuper.com.br/" target="_blank" class="text-xs bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+              Abrir Site Oficial <i class="fas fa-arrow-up-right-from-square text-[10px]"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Banner Informativo de Links Permanentes -->
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/80 rounded-xl p-4 mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+              <i class="fas fa-link text-sm"></i>
+            </div>
+            <div>
+              <h4 class="text-xs font-bold text-slate-900">Diretriz de Links Permanentes no SDR:</h4>
+              <p class="text-xs text-slate-600 mt-0.5">
+                O motor do Treinador e a IA utilizam <strong>estritamente o link permanente real cadastrado em cada produto</strong>. Nenhuma URL é gerada com o título ou slug inventado. Você pode alterar o link de qualquer produto clicando em <strong>Editar Cadastro / Link</strong>.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-lg bg-white border border-blue-200 shadow-2xs shrink-0 text-blue-800">
+            <i class="fas fa-shield-halved text-emerald-600"></i> Links Oficiais Protegidos
+          </div>
+        </div>
+
+        <!-- Barra de Busca, Filtro por Setor e Controles de Catálogo (328+ Produtos) -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-6 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+          <div class="flex-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <div class="relative flex-1">
+              <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              <input type="text" id="inputBuscaCatalogo" oninput="app.filtrarCatalogo()" placeholder="Buscar nos 328 produtos por nome, SKU, material ou diferencial (ex: PETG, fita cross, espeto)..." class="w-full pl-9 pr-8 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+              <button type="button" onclick="document.getElementById('inputBuscaCatalogo').value = ''; app.filtrarCatalogo();" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs cursor-pointer" title="Limpar busca">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <select id="selectFiltroSetorCatalogo" onchange="app.filtrarCatalogo()" class="text-xs bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
+              <option value="">Todos os Setores (Todos)</option>
+            </select>
+          </div>
+          <div class="flex items-center justify-between sm:justify-end gap-3 shrink-0">
+            <span class="text-xs text-slate-500 font-medium">
+              Exibindo <strong id="contadorCatalogoFiltrado" class="text-blue-600 font-bold">0</strong> de <strong id="contadorCatalogoTotal" class="text-slate-800 font-bold">0</strong> produtos
+            </span>
+            <button type="button" onclick="app.executarVarreduraWebSite(true)" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold px-3 py-1.5 rounded-lg border border-blue-200 transition flex items-center gap-1.5 cursor-pointer" title="Puxar produtos atualizados diretamente do site oficial">
+              <i class="fas fa-arrows-rotate text-[10px]"></i> Sincronizar Site
+            </button>
+          </div>
+        </div>
+
+        <!-- Grid de Produtos -->
+        <div id="gridCatalogoProdutos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Renderizado dinamicamente via JS -->
+        </div>
+
+        <!-- Paginação do Catálogo Oficial -->
+        <div id="containerPaginacaoCatalogo" class="mt-6 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
+          <div class="flex items-center gap-2">
+            <span>Página <strong id="paginacaoPaginaAtual">1</strong> de <strong id="paginacaoTotalPaginas">1</strong></span>
+            <span class="text-slate-300">•</span>
+            <span id="paginacaoFaixaExibicao">Mostrando 1-24 de 328</span>
+          </div>
+          <div class="flex items-center gap-1" id="botoesPaginacaoCatalogo">
+            <!-- Botões gerados via JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ========================================== -->
+    <!-- ABA 5: CONEXÃO CRM LIVE (MCP)              -->
+    <!-- ========================================== -->
+    <section id="secao-crm" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <i class="fas fa-tower-broadcast text-emerald-600"></i>
+                Painel MCP Live - Integração Direta com o CRM (leads.ciasuper.com.br)
+              </h2>
+              <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full">Protocolo MCP Ativo</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">Conexão direta com a API do CRM para minerar atendimentos reais do WhatsApp, vendas e catálogo de produtos.</p>
+          </div>
+          <button onclick="app.conectarAoCRM()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 border border-slate-300">
+            <i class="fas fa-arrows-rotate"></i> Atualizar Dados do CRM
+          </button>
+        </div>
+
+        <!-- Painel de Métricas do CRM -->
+        <div id="painelResumoCrm">
+          <!-- Renderizado via JS -->
+        </div>
+
+        <!-- Card de Mineração Automática de Atendimentos & Cases do CRM -->
+        <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white rounded-2xl p-6 shadow-lg mb-6 border border-blue-700/40">
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30">
+                  <i class="fas fa-brain"></i> IA Mineradora Contínua
+                </span>
+                <span class="text-xs text-slate-300">Conexão MCP Live</span>
+              </div>
+              <h3 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                Minerar Atendimentos Reais & Cases de Sucesso do CRM
+              </h3>
+              <p class="text-xs text-blue-200/80 max-w-2xl">
+                O Treinador analisa as conversas reais do WhatsApp e as vendas convertidas no CRM. A IA extrai as perguntas mais frequentes dos donos de comércio e as respostas que mais geraram vendas, adicionando-as automaticamente ao histórico de aprendizado do SDR.
+              </p>
+            </div>
+            <button onclick="app.minerarConversasECasesDoCRM()" id="btnIniciarMineracaoCrm" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs px-5 py-3 rounded-xl transition shadow-lg shadow-emerald-600/30 flex items-center gap-2 whitespace-nowrap self-stretch md:self-auto justify-center cursor-pointer">
+              <i class="fas fa-wand-magic-sparkles text-amber-300 text-sm"></i>
+              <span>Iniciar Mineração com IA</span>
+            </button>
+          </div>
+
+          <!-- Barra de Progresso e Status da Mineração -->
+          <div id="statusMineracaoCrm" class="hidden mt-5 pt-4 border-t border-white/10 space-y-2">
+            <div class="flex items-center justify-between text-xs text-blue-200">
+              <span id="textoProgressoMineracao" class="flex items-center gap-2 font-medium">
+                <i class="fas fa-spinner fa-spin text-amber-400"></i> Analisando conversas...
+              </span>
+              <span id="porcentagemProgressoMineracao" class="font-bold text-white">0%</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden border border-slate-700">
+              <div id="barraProgressoMineracao" class="bg-gradient-to-r from-blue-400 to-emerald-400 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção de Cases de Sucesso Convertidos no CRM -->
+        <div id="secaoCasesConvertidosCrm" class="mb-6">
+          <!-- Renderizado dinamicamente via JS -->
+        </div>
+
+        <!-- Feed de Leads Reais em Tempo Real -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden bg-white mt-4">
+          <div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+              <i class="fas fa-comments text-blue-600"></i>
+              Leads Reais Recentes (WhatsApp / Catálogo / Site)
+            </h3>
+            <span class="text-[11px] text-slate-400">Clique em qualquer lead para puxar e treinar a dúvida dele no simulador</span>
+          </div>
+          <div id="listaLeadsReaisCrm">
+            <p class="text-xs text-slate-400 p-6 text-center">Carregando leads do CRM...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- ABA 6: CHAT DE TESTE (LEAD X SDR AO VIVO)  -->
+    <!-- ========================================== -->
+    <section id="secao-chat" class="hidden space-y-6">
+      <!-- Cabeçalho explicativo -->
+      <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 rounded-2xl p-6 text-white shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-xs font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-2.5 py-0.5 rounded-full flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              Simulador de Conversa em Tempo Real
+            </span>
+            <span class="text-xs bg-white/10 text-slate-200 px-2 py-0.5 rounded-md font-mono">WhatsApp Experience</span>
+          </div>
+          <h2 class="text-xl font-extrabold flex items-center gap-2">
+            <i class="fas fa-comments text-indigo-400"></i> Chat de Teste: Lead Conversando com o Agente SDR
+          </h2>
+          <p class="text-xs text-indigo-100 max-w-2xl leading-relaxed">
+            Converse diretamente como se você fosse um cliente (supermercado, hortifrúti, açougue ou rede). Veja as respostas ao vivo do Agente SDR aplicando a Regra de Ouro (100% soluções físicas de PDV), catálogo oficial com links permanentes reais e transbordo para o Joelson.
+          </p>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <button type="button" onclick="app.executarAutoPlaySimulacao()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2.5 rounded-xl transition shadow-md flex items-center gap-2 text-xs cursor-pointer">
+            <i class="fas fa-play"></i> Simulação Automática (Auto-Play)
+          </button>
+          <button type="button" onclick="app.reiniciarChat(true)" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3.5 py-2.5 rounded-xl transition shadow-md flex items-center gap-1.5 text-xs cursor-pointer" title="Começar uma nova conversa do zero (limpar chat)">
+            <i class="fas fa-plus-circle text-emerald-300"></i> Nova Conversa (Do Zero)
+          </button>
+        </div>
+      </div>
+
+      <!-- Grid Principal: Controles na esquerda e Chat WhatsApp na direita -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Coluna Esquerda: Cenários, Personas e Perguntas Rápidas (4 colunas) -->
+        <div class="lg:col-span-4 space-y-4">
+          
+          <!-- Card de Seleção de Persona -->
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center justify-between mb-3">
+              <span class="flex items-center gap-1.5">
+                <i class="fas fa-user-tag text-indigo-600"></i> Persona do Lead (Cliente)
+              </span>
+              <span class="text-[10px] text-slate-400 font-normal">Quem você é no chat</span>
+            </h3>
+
+            <div class="space-y-2" id="seletorPersonasChat">
+              <button type="button" onclick="app.selecionarPersonaChat('hortifruti')" id="btnPersona-hortifruti" class="w-full text-left p-2.5 rounded-xl border border-blue-600 bg-blue-50/70 transition flex items-start gap-2.5 cursor-pointer persona-item">
+                <span class="text-xl shrink-0">🍉</span>
+                <div class="flex-1 min-w-0">
+                  <div class="font-bold text-xs text-slate-900">Arnaldo • Hortifrúti</div>
+                  <div class="text-[11px] text-slate-600 truncate">Água estraga cartazes de papel todo dia</div>
+                </div>
+              </button>
+
+              <button type="button" onclick="app.selecionarPersonaChat('acougue')" id="btnPersona-acougue" class="w-full text-left p-2.5 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition flex items-start gap-2.5 cursor-pointer persona-item">
+                <span class="text-xl shrink-0">🥩</span>
+                <div class="flex-1 min-w-0">
+                  <div class="font-bold text-xs text-slate-900">Carlos • Açougue & Carnes</div>
+                  <div class="text-[11px] text-slate-600 truncate">Balcão frio, gordura e preços caindo</div>
+                </div>
+              </button>
+
+              <button type="button" onclick="app.selecionarPersonaChat('clipstrip')" id="btnPersona-clipstrip" class="w-full text-left p-2.5 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition flex items-start gap-2.5 cursor-pointer persona-item">
+                <span class="text-xl shrink-0">🏷️</span>
+                <div class="flex-1 min-w-0">
+                  <div class="font-bold text-xs text-slate-900">Mariana • Compradora de Rede</div>
+                  <div class="text-[11px] text-slate-600 truncate">Fita cross / clip strip 100 unidades</div>
+                </div>
+              </button>
+
+              <button type="button" onclick="app.selecionarPersonaChat('cartazista')" id="btnPersona-cartazista" class="w-full text-left p-2.5 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition flex items-start gap-2.5 cursor-pointer persona-item">
+                <span class="text-xl shrink-0">💰</span>
+                <div class="flex-1 min-w-0">
+                  <div class="font-bold text-xs text-slate-900">Roberto • Supermercado</div>
+                  <div class="text-[11px] text-slate-600 truncate">Custo alto com cartazista e papel</div>
+                </div>
+              </button>
+
+              <button type="button" onclick="app.selecionarPersonaChat('expansao')" id="btnPersona-expansao" class="w-full text-left p-2.5 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition flex items-start gap-2.5 cursor-pointer persona-item">
+                <span class="text-xl shrink-0">🏢</span>
+                <div class="flex-1 min-w-0">
+                  <div class="font-bold text-xs text-slate-900">Juliana • Expansão / CNPJ</div>
+                  <div class="text-[11px] text-slate-600 truncate">Orçamento loja inteira com Joelson</div>
+                </div>
+              </button>
+
+              <button type="button" onclick="app.selecionarPersonaChat('armadilha')" id="btnPersona-armadilha" class="w-full text-left p-2.5 rounded-xl border border-amber-300 bg-amber-50/60 hover:bg-amber-50 transition flex items-start gap-2.5 cursor-pointer persona-item">
+                <span class="text-xl shrink-0">⚠️</span>
+                <div class="flex-1 min-w-0">
+                  <div class="font-bold text-xs text-amber-950">Teste de Armadilha (Digital/App)</div>
+                  <div class="text-[11px] text-amber-800 truncate">Pede software/app para testar guardrail</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card de Perguntas Rápidas de Disparo -->
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center justify-between mb-3">
+              <span class="flex items-center gap-1.5">
+                <i class="fas fa-bolt text-amber-500"></i> Disparos Rápidos do Lead
+              </span>
+              <span class="text-[10px] text-slate-400 font-normal">Clique para enviar</span>
+            </h3>
+
+            <div class="space-y-1.5" id="listaPerguntasRapidasChat">
+              <!-- Renderizado dinamicamente via JS -->
+            </div>
+          </div>
+
+          <!-- Guardrails Ativos -->
+          <div class="bg-slate-50 rounded-2xl border border-slate-200 p-4 text-xs space-y-2">
+            <div class="font-bold text-slate-800 flex items-center justify-between">
+              <span class="flex items-center gap-1.5">
+                <i class="fas fa-shield-halved text-emerald-600"></i> Guardrails Ativos no Chat
+              </span>
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">100% Protegido</span>
+            </div>
+            <ul class="text-[11px] text-slate-600 space-y-1 list-disc list-inside">
+              <li><strong>Zero Menção Digital:</strong> Proibido citar Criar Ofertas ou software.</li>
+              <li><strong>Links Oficiais:</strong> Apenas URLs permanentes cadastradas.</li>
+              <li><strong>Transbordo Inteligente:</strong> Direciona atacado para <strong>Joelson</strong>.</li>
+              <li><strong>Cérebro Ativo:</strong> Alimentado por aprendizados com like.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Coluna Direita: Janela Estilo WhatsApp Web (8 colunas) -->
+        <div class="lg:col-span-8">
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-[650px]">
+            
+            <!-- Header do Chat (WhatsApp Style) -->
+            <div class="bg-gradient-to-r from-slate-900 to-indigo-950 p-4 text-white flex items-center justify-between border-b border-slate-800 shrink-0">
+              <div class="flex items-center gap-3">
+                <div class="relative">
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-sm">
+                    <i class="fas fa-robot text-base"></i>
+                  </div>
+                  <span class="w-3 h-3 rounded-full bg-emerald-500 border-2 border-slate-900 absolute bottom-0 right-0"></span>
+                </div>
+                <div>
+                  <div class="font-bold text-sm flex items-center gap-2">
+                    <span>Consultor SDR • Visual Super</span>
+                    <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold px-2 py-0.2 rounded-full">
+                      Online
+                    </span>
+                  </div>
+                  <div class="text-[11px] text-slate-300 flex items-center gap-2">
+                    <span>Soluções Físicas PDV</span>
+                    <span>•</span>
+                    <span id="chatMotorAtivoBadge" class="text-indigo-300 font-mono">Motor: IA Conectada</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="app.resetarMemoriaAprendizados()" class="text-xs bg-red-500/20 hover:bg-red-500/30 text-red-200 border border-red-500/30 font-semibold px-2.5 py-1.5 rounded-lg transition flex items-center gap-1.5 cursor-pointer" title="Resetar e recarregar toda a memória do agente com os aprendizados oficiais atualizados">
+                  <i class="fas fa-arrows-rotate text-[11px] text-red-300"></i>
+                  <span class="hidden sm:inline">Resetar Memória</span>
+                </button>
+                <button type="button" onclick="app.salvarTodaConversaNoHistorico()" class="text-xs bg-white/10 hover:bg-white/20 text-white font-semibold px-3 py-1.5 rounded-lg transition border border-white/20 flex items-center gap-1.5 cursor-pointer" title="Salvar conversa inteira como aprendizado no Cérebro">
+                  <i class="fas fa-thumbs-up text-emerald-400"></i>
+                  <span class="hidden sm:inline">Salvar Conversa com Like</span>
+                </button>
+                <button type="button" onclick="app.reiniciarChat(true)" class="text-slate-300 hover:text-white p-2 rounded-lg hover:bg-white/10 transition cursor-pointer" title="Começar nova conversa do zero (limpar chat)">
+                  <i class="fas fa-trash-can text-sm"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Área de Mensagens (Fundo WhatsApp com balões) -->
+            <div id="chatMensagensContainer" class="flex-1 p-4 overflow-y-auto space-y-3 bg-[#e5ddd5]/30">
+              <!-- Renderizado dinamicamente via JS -->
+            </div>
+
+            <!-- Indicador de "Digitando..." (Estilo WhatsApp autêntico com bolinhas pulsantes) -->
+            <div id="chatDigitandoIndicador" class="hidden px-4 py-2.5 bg-[#e5ddd5]/30 flex items-center gap-2 text-xs">
+              <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shrink-0 shadow-2xs">
+                VS
+              </div>
+              <div class="bg-white px-3.5 py-2 rounded-2xl rounded-tl-none border border-slate-200/80 shadow-2xs flex items-center gap-2.5 text-slate-600">
+                <span class="flex items-center gap-1">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-bounce"></span>
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-bounce [animation-delay:0.2s]"></span>
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-bounce [animation-delay:0.4s]"></span>
+                </span>
+                <span class="text-[11px] font-medium text-slate-600">Consultor SDR está digitando...</span>
+              </div>
+            </div>
+
+            <!-- Rodapé / Barra de Envio (Estilo WhatsApp) -->
+            <div class="p-3 bg-slate-50 border-t border-slate-200 flex items-center gap-2 shrink-0">
+              <div class="relative flex-1">
+                <input type="text" id="inputChatMensagemLead" onkeydown="if(event.key==='Enter') app.enviarMensagemLeadManual()" placeholder="Digite uma mensagem como o lead para testar o agente..." class="w-full text-sm rounded-xl border border-slate-300 bg-white py-2.5 pl-4 pr-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-slate-800">
+                <button type="button" onclick="document.getElementById('inputChatMensagemLead').value=''" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs cursor-pointer">
+                  <i class="fas fa-circle-xmark"></i>
+                </button>
+              </div>
+
+              <button type="button" onclick="app.enviarMensagemLeadManual()" id="btnEnviarChat" class="bg-blue-600 hover:bg-blue-700 text-white font-bold w-11 h-11 rounded-xl transition flex items-center justify-center shadow-md shadow-blue-600/20 shrink-0 cursor-pointer">
+                <i class="fas fa-paper-plane text-sm"></i>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- ABA 7: CONFIGURAÇÕES & VARREDURA WEB      -->
+    <!-- ========================================== -->
+    <section id="secao-configuracoes" class="hidden space-y-6">
+
+      <!-- Banner Superior: Status da Conexão Web & Auto-Aprendizado -->
+      <div class="rounded-2xl p-6 bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 text-white shadow-lg border border-slate-800">
+        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white text-xl shadow-md shadow-blue-500/20 shrink-0">
+              <i class="fas fa-radar animate-pulse"></i>
+            </div>
+            <div class="space-y-1">
+              <div class="flex items-center gap-2.5 flex-wrap">
+                <h3 class="font-bold text-base text-white">Configurações da Empresa & Auto-Aprendizado Web</h3>
+                <span id="badgeStatusVarreduraWeb" class="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                  <span>Varredura Automática Ativa</span>
+                </span>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed max-w-2xl">
+                O agente SDR monitora continuamente o site oficial da <strong>Visual Super</strong>, aprendendo novos produtos, diferenciais de PDV e atualizações de preços para responder sempre com máxima precisão.
+              </p>
+              <div class="flex items-center gap-4 text-xs text-slate-400 pt-1 flex-wrap font-mono">
+                <span class="flex items-center gap-1"><i class="fas fa-globe text-blue-400"></i> <span id="labelSiteOficialAtivo">https://visualsuper.com.br</span></span>
+                <span>•</span>
+                <span class="flex items-center gap-1"><i class="fas fa-clock-rotate-left text-indigo-400"></i> Última Varredura: <strong id="labelUltimaVarreduraWeb" class="text-slate-200">Hoje às 11:15</strong></span>
+                <span>•</span>
+                <span class="flex items-center gap-1"><i class="fas fa-boxes-stacked text-emerald-400"></i> <strong id="labelTotalProdutosVarredura" class="text-slate-200">328 Soluções</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botões de Ação do Header -->
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full lg:w-auto shrink-0">
+            <a id="linkAbrirSiteOficial" href="https://visualsuper.com.br" target="_blank" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer">
+              <i class="fas fa-arrow-up-right-from-square"></i> Abrir Site Oficial
+            </a>
+            <button type="button" onclick="app.executarVarreduraWebSite(true)" id="btnDispararVarreduraWeb" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-blue-600/30 transition cursor-pointer">
+              <i class="fas fa-rotate"></i>
+              <span id="btnDispararVarreduraTexto">Varrer & Aprender Todo o Site Agora</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Barra de Progresso da Varredura (exibida durante execução) -->
+        <div id="barraProgressoVarreduraWeb" class="hidden mt-5 pt-4 border-t border-slate-800 space-y-2">
+          <div class="flex items-center justify-between text-xs font-semibold">
+            <span id="textoProgressoVarreduraWeb" class="text-blue-300 flex items-center gap-2">
+              <i class="fas fa-spinner fa-spin text-blue-400"></i> Conectando ao site e rastreando soluções...
+            </span>
+            <span id="percProgressoVarreduraWeb" class="text-slate-300 font-mono">0%</span>
+          </div>
+          <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
+            <div id="barraProgressoVarreduraFill" class="bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-400 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid Principal: Configurações Institucionais e Automação da Varredura -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Coluna 1: Dados Oficiais da Visual Super (7 colunas) -->
+        <div class="lg:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-5">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-bold border border-blue-100">
+                <i class="fas fa-building"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-slate-800 text-sm">Informações Oficiais da Visual Super</h4>
+                <p class="text-xs text-slate-400">Dados cadastrais e comerciais ensinados diretamente à IA</p>
+              </div>
+            </div>
+            <span class="text-[10px] bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full font-bold">Base SDR</span>
+          </div>
+
+          <form id="formConfiguracoesEmpresa" onsubmit="event.preventDefault(); app.salvarConfiguracaoEmpresaManual();" class="space-y-4">
+            <!-- URL do Site Oficial -->
+            <div>
+              <label for="cfgSiteOficial" class="block font-bold text-xs text-slate-700 mb-1 flex items-center justify-between">
+                <span class="flex items-center gap-1.5"><i class="fas fa-globe text-blue-600"></i> Site Oficial da Empresa (Alvo da Varredura):</span>
+                <span class="text-[10px] text-slate-400 font-normal">Origem para aprender produtos e links</span>
+              </label>
+              <div class="flex gap-2">
+                <input type="url" id="cfgSiteOficial" placeholder="https://visualsuper.com.br" required class="flex-1 text-xs border border-slate-300 rounded-xl px-3.5 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none font-medium text-slate-800">
+                <button type="button" onclick="window.open(document.getElementById('cfgSiteOficial').value, '_blank')" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold border border-slate-200 transition flex items-center gap-1 cursor-pointer">
+                  <i class="fas fa-external-link-alt"></i> Testar
+                </button>
+              </div>
+            </div>
+
+            <!-- Grid 2 Colunas: Nome e Especialista -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label for="cfgNomeEmpresa" class="block font-bold text-xs text-slate-700 mb-1">Nome Fantasia da Empresa:</label>
+                <input type="text" id="cfgNomeEmpresa" placeholder="Visual Super" required class="w-full text-xs border border-slate-300 rounded-xl px-3.5 py-2 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-slate-800">
+              </div>
+              <div>
+                <label for="cfgResponsavelComercial" class="block font-bold text-xs text-slate-700 mb-1">Especialista Comercial (Handoff / CNPJ):</label>
+                <input type="text" id="cfgResponsavelComercial" placeholder="Joelson" required class="w-full text-xs border border-slate-300 rounded-xl px-3.5 py-2 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-slate-800">
+              </div>
+            </div>
+
+            <!-- Grid 2 Colunas: WhatsApp e Horário -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label for="cfgWhatsappComercial" class="block font-bold text-xs text-slate-700 mb-1">WhatsApp Oficial do Joelson / Loja:</label>
+                <input type="text" id="cfgWhatsappComercial" placeholder="(48) 99853-0080" required class="w-full text-xs border border-slate-300 rounded-xl px-3.5 py-2 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-slate-800 font-mono">
+              </div>
+              <div>
+                <label for="cfgHorarioAtendimento" class="block font-bold text-xs text-slate-700 mb-1">Horário de Atendimento:</label>
+                <input type="text" id="cfgHorarioAtendimento" placeholder="Segunda a Sexta, das 08h às 17h30" required class="w-full text-xs border border-slate-300 rounded-xl px-3.5 py-2 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-slate-800">
+              </div>
+            </div>
+
+            <!-- Grid 2 Colunas: Email e Cidade -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label for="cfgEmailContato" class="block font-bold text-xs text-slate-700 mb-1">E-mail Oficial:</label>
+                <input type="email" id="cfgEmailContato" placeholder="contato@visualsuper.com.br" class="w-full text-xs border border-slate-300 rounded-xl px-3.5 py-2 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-slate-800">
+              </div>
+              <div>
+                <label for="cfgCidadeBase" class="block font-bold text-xs text-slate-700 mb-1">Cidade Base & Abrangência:</label>
+                <input type="text" id="cfgCidadeBase" placeholder="Florianópolis/SC • Atendimento Nacional" class="w-full text-xs border border-slate-300 rounded-xl px-3.5 py-2 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-slate-800">
+              </div>
+            </div>
+
+            <!-- Descrição Institucional -->
+            <div>
+              <label for="cfgDescricaoEmpresa" class="block font-bold text-xs text-slate-700 mb-1">Posicionamento Institucional & Soluções da Visual Super:</label>
+              <textarea id="cfgDescricaoEmpresa" rows="2" class="w-full text-xs border border-slate-300 rounded-xl p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-slate-800 leading-relaxed resize-none"></textarea>
+            </div>
+
+            <!-- Regra de Ouro -->
+            <div>
+              <label for="cfgRegraDeOuro" class="block font-bold text-xs text-slate-700 mb-1 flex items-center justify-between">
+                <span class="flex items-center gap-1 text-amber-700"><i class="fas fa-shield-halved"></i> Regra de Ouro Inegociável (Guardrail Mandatório):</span>
+                <span class="text-[10px] text-amber-600 font-semibold uppercase">Ativa em 100% dos Chats</span>
+              </label>
+              <textarea id="cfgRegraDeOuro" rows="2" class="w-full text-xs border border-amber-300 rounded-xl p-3 bg-amber-50/70 focus:bg-white focus:ring-2 focus:ring-amber-500 outline-none text-slate-800 leading-relaxed resize-none font-medium"></textarea>
+            </div>
+
+            <!-- Botões de Ação do Formulário -->
+            <div class="flex items-center justify-between pt-2">
+              <button type="button" onclick="app.restaurarConfiguracaoEmpresaPadrao()" class="text-xs text-slate-500 hover:text-slate-800 underline font-medium cursor-pointer">
+                Restaurar Padrões de Fábrica
+              </button>
+              <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-blue-600/20 transition cursor-pointer">
+                <i class="fas fa-floppy-disk"></i> Salvar Informações da Empresa
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Coluna 2: Automação da Varredura & Monitoramento (5 colunas) -->
+        <div class="lg:col-span-5 space-y-6">
+
+          <!-- Card de Automação Periódica -->
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+            <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+              <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm font-bold border border-indigo-100">
+                <i class="fas fa-robot"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-slate-800 text-sm">Frequência da Varredura Automática</h4>
+                <p class="text-xs text-slate-400">Varre o site e aprende novos produtos em segundo plano</p>
+              </div>
+            </div>
+
+            <!-- Toggle de Auto-Varredura -->
+            <div class="flex items-center justify-between p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+              <div class="space-y-0.5">
+                <div class="font-bold text-xs text-slate-800">Auto-Varredura Contínua</div>
+                <div class="text-[11px] text-slate-500">Buscar novos produtos no site automaticamente</div>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="cfgAutoVarreduraAtiva" onchange="app.alternarAutoVarredura(this.checked)" class="sr-only peer" checked>
+                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+
+            <!-- Frequência -->
+            <div>
+              <label for="cfgIntervaloVarreduraHoras" class="block font-bold text-xs text-slate-700 mb-1.5">Intervalo de Verificação no Site:</label>
+              <select id="cfgIntervaloVarreduraHoras" onchange="app.atualizarIntervaloVarredura(this.value)" class="w-full text-xs border border-slate-300 rounded-xl p-2.5 bg-white focus:ring-2 focus:ring-blue-500 outline-none text-slate-800 font-medium cursor-pointer">
+                <option value="1">A cada 1 hora (Tempo Real)</option>
+                <option value="6" selected>A cada 6 horas (Recomendado)</option>
+                <option value="12">A cada 12 horas (2x ao dia)</option>
+                <option value="24">A cada 24 horas (Diariamente)</option>
+              </select>
+            </div>
+
+            <!-- Checklist de Inteligência Aprendida -->
+            <div class="space-y-2 pt-1 text-xs">
+              <div class="font-bold text-[11px] uppercase tracking-wider text-slate-400">O que o Robô Aprende no Site:</div>
+              <div class="space-y-1.5 text-slate-600 text-[11px]">
+                <div class="flex items-center gap-2 text-emerald-700 font-medium">
+                  <i class="fas fa-check-circle text-emerald-500"></i>
+                  <span>Novos produtos cadastrados na loja online</span>
+                </div>
+                <div class="flex items-center gap-2 text-emerald-700 font-medium">
+                  <i class="fas fa-check-circle text-emerald-500"></i>
+                  <span>Links permanentes reais oficiais das soluções</span>
+                </div>
+                <div class="flex items-center gap-2 text-emerald-700 font-medium">
+                  <i class="fas fa-check-circle text-emerald-500"></i>
+                  <span>Diferenciais mecânicos (PETG, ACM, Inox atóxico)</span>
+                </div>
+                <div class="flex items-center gap-2 text-emerald-700 font-medium">
+                  <i class="fas fa-check-circle text-emerald-500"></i>
+                  <span>Preços médios e referências para orçamentos</span>
+                </div>
+                <div class="flex items-center gap-2 text-emerald-700 font-medium">
+                  <i class="fas fa-check-circle text-emerald-500"></i>
+                  <span>Alimentação automática do Cérebro do SDR com Like</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card de Estatísticas do Crawler -->
+          <div class="bg-gradient-to-br from-blue-50 to-indigo-50/60 rounded-2xl p-5 border border-blue-200/80 space-y-3">
+            <h5 class="font-bold text-xs text-blue-900 flex items-center gap-1.5">
+              <i class="fas fa-chart-pie text-blue-600"></i>
+              <span>Métricas da Inteligência Web da Visual Super</span>
+            </h5>
+            <div class="grid grid-cols-2 gap-3 text-center">
+              <div class="bg-white p-3 rounded-xl border border-blue-100 shadow-2xs">
+                <span class="text-[10px] text-slate-400 block font-semibold">Páginas Rastreadas</span>
+                <span id="statPaginasRastreadasCfg" class="font-bold text-base text-blue-700">12</span>
+              </div>
+              <div class="bg-white p-3 rounded-xl border border-blue-100 shadow-2xs">
+                <span class="text-[10px] text-slate-400 block font-semibold">Soluções no Cérebro</span>
+                <span id="statSolucoesAtivasCfg" class="font-bold text-base text-emerald-700">328</span>
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-500 italic text-center">
+              Toda nova informação aprendida no site é imediatamente disponibilizada para o Chat SDR e para o Simulador de 5 Alternativas.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Card Inferior: Histórico de Soluções e Produtos Aprendidos no Site -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm font-bold border border-emerald-100">
+              <i class="fas fa-list-check"></i>
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-800 text-sm">Registro de Descobertas e Soluções Sincronizadas do Site</h4>
+              <p class="text-xs text-slate-400">Soluções físicas extraídas do site visualsuper.com.br ativas no motor do SDR</p>
+            </div>
+          </div>
+          <button type="button" onclick="app.executarVarreduraWebSite(true)" class="text-xs text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1 cursor-pointer">
+            <i class="fas fa-rotate"></i> Atualizar Agora
+          </button>
+        </div>
+
+        <!-- Lista Dinâmica de Soluções Aprendidas -->
+        <div id="listaSolucoesAprendidasWeb" class="divide-y divide-slate-100 text-xs">
+          <!-- Preenchido via app.renderizarConfiguracoes() -->
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- MODAL DE CONFIGURAÇÃO DA CHAVE GEMINI IA -->
+  <div id="modalConfigIA" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden transition-all duration-300 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full overflow-hidden transform transition-all">
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-5 text-white flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-xl">
+            <i class="fas fa-key text-amber-300"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base">Chave de API da IA (Google Gemini)</h3>
+            <p class="text-xs text-blue-100">Inteligência profunda conectada ao Catálogo Visual Super</p>
+          </div>
+        </div>
+        <button onclick="fecharModalConfigIA()" class="text-white/80 hover:text-white text-lg p-1 rounded-lg hover:bg-white/10 transition">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-4">
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-3.5 text-xs text-blue-900 leading-relaxed">
+          <p class="font-semibold mb-1 flex items-center gap-1.5 text-blue-800">
+            <i class="fas fa-lightbulb text-amber-500"></i> Como funciona a IA no Treinador:
+          </p>
+          Com a chave ativada, a IA analisa a pergunta real do cliente, identifica o setor (hortifrúti, açougue, gôndolas) e seleciona o produto físico exato da <strong>Visual Super</strong>, gerando 5 alternativas de WhatsApp persuasivas, técnicas e exclusivas com links oficiais.
+        </div>
+
+        <div>
+          <label for="inputGeminiApiKey" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+            <span>Chave de API Gemini (API Key)</span>
+            <span id="statusSalvoModal" class="text-[11px] font-normal text-slate-400">Não configurada</span>
+          </label>
+          <div class="relative">
+            <input type="password" id="inputGeminiApiKey" placeholder="Cole aqui sua chave (ex.: AIzaSy...)" class="w-full text-sm rounded-xl border border-slate-300 p-3 pr-24 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none font-mono">
+            <button type="button" onclick="alternarVisibilidadeChave()" class="absolute right-2 top-1/2 -translate-y-1/2 text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-2.5 py-1.5 rounded-lg border border-slate-200 transition">
+              <i id="iconeOlhoChave" class="fas fa-eye"></i>
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-1.5">
+            Dica: É a mesma chave do Google Gemini utilizada no CRM ou criada gratuitamente no <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-600 hover:underline font-semibold">Google AI Studio</a>.
+          </p>
+        </div>
+
+        <div id="resultadoTesteConexao" class="hidden p-3 rounded-xl text-xs font-medium border">
+          <!-- Resultado do teste de conexão -->
+        </div>
+
+        <div class="flex items-center justify-between pt-3 border-t border-slate-100 gap-2 flex-wrap">
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="testarChaveGeminiModal()" id="btnTestarChave" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5 border border-slate-200">
+              <i class="fas fa-vial"></i> Testar Conexão
+            </button>
+            <button type="button" onclick="removerChaveGeminiModal()" id="btnRemoverChave" class="text-xs text-rose-600 hover:bg-rose-50 px-3 py-2 rounded-xl transition hidden">
+              <i class="fas fa-trash"></i> Remover
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="fecharModalConfigIA()" class="text-xs text-slate-500 hover:text-slate-700 font-medium px-3 py-2">
+              Cancelar
+            </button>
+            <button type="button" onclick="salvarChaveGeminiModal()" class="text-xs bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-xl transition shadow-md shadow-blue-600/20 flex items-center gap-1.5">
+              <i class="fas fa-save"></i> Salvar e Ativar IA
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE VISUALIZAÇÃO DE CONVERSA DO CRM -->
+  <div id="modalVisualizarConversa" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden transition-all duration-300 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-2xl w-full overflow-hidden transform transition-all flex flex-col max-h-[90vh]">
+      <!-- Header do Chat -->
+      <div class="bg-slate-900 p-4 text-white flex items-center justify-between border-b border-slate-800">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shadow">
+            <i class="fab fa-whatsapp text-lg"></i>
+          </div>
+          <div>
+            <h3 id="modalChatNomeCliente" class="font-bold text-sm">Nome do Lead</h3>
+            <p id="modalChatInfoSub" class="text-[11px] text-slate-400">WhatsApp Oficial • Visual Super</p>
+          </div>
+        </div>
+        <button onclick="fecharModalConversa()" class="text-slate-400 hover:text-white text-lg p-1 rounded-lg hover:bg-slate-800 transition">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Área de Mensagens (Estilo WhatsApp) -->
+      <div id="modalChatMensagensCorpo" class="p-4 overflow-y-auto flex-1 space-y-3 bg-[#efeae2]/30 text-xs min-h-[300px]">
+        <!-- Renderizado dinamicamente -->
+      </div>
+
+      <!-- Rodapé com Ação de Mineração -->
+      <div class="p-4 bg-white border-t border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div class="text-[11px] text-slate-500 flex items-center gap-1.5">
+          <i class="fas fa-info-circle text-blue-500"></i> Histórico real obtido via protocolo MCP do CRM.
+        </div>
+        <div class="flex items-center gap-2 self-end sm:self-auto flex-wrap">
+          <button onclick="fecharModalConversa()" class="text-xs text-slate-500 hover:text-slate-700 font-medium px-3 py-2 cursor-pointer">
+            Fechar
+          </button>
+          <button onclick="app.treinarConversaModalAtual()" class="text-xs bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-xl transition shadow flex items-center gap-1.5 cursor-pointer">
+            <i class="fas fa-comments"></i> Treinar no Simulador
+          </button>
+          <button id="btnMinerarConversaAtual" onclick="app.minerarConversaModalAtual()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl transition shadow flex items-center gap-1.5 cursor-pointer">
+            <i class="fas fa-brain"></i> Extrair Aprendizado Desta Conversa
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE CADASTRO E EDIÇÃO DE LINK PERMANENTE DO PRODUTO -->
+  <div id="modalEditarProduto" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden transition-all duration-300 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-xl w-full overflow-hidden transform transition-all flex flex-col max-h-[92vh]">
+      <!-- Header do Modal -->
+      <div class="bg-gradient-to-r from-blue-700 to-indigo-800 p-5 text-white flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-lg shadow-inner">
+            <i class="fas fa-link text-amber-300"></i>
+          </div>
+          <div>
+            <h3 id="modalTituloProduto" class="font-bold text-base">Cadastro & Link Permanente do Produto</h3>
+            <p class="text-xs text-blue-100/80">URL real permanente do e-commerce / CRM utilizada pela IA</p>
+          </div>
+        </div>
+        <button onclick="fecharModalEditarProduto()" class="text-white/70 hover:text-white text-lg p-1 rounded-lg hover:bg-white/10 transition cursor-pointer">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Corpo do Formulário -->
+      <div class="p-5 overflow-y-auto space-y-4 text-xs">
+        <input type="hidden" id="formProdutoId" value="">
+
+        <!-- Linha: Nome do Produto -->
+        <div>
+          <label class="block font-bold text-slate-800 mb-1" for="formProdutoNome">
+            Nome Completo do Produto: <span class="text-rose-500">*</span>
+          </label>
+          <input type="text" id="formProdutoNome" class="w-full p-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-slate-800" placeholder="Ex: Precificador E3 com Pedestal Regulável e Bolsa A5">
+        </div>
+
+        <!-- Linha 2 Colunas: SKU e Setor -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-800 mb-1" for="formProdutoSku">
+              SKU / Código do Produto:
+            </label>
+            <input type="text" id="formProdutoSku" class="w-full p-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-slate-800" placeholder="Ex: 34970">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-800 mb-1" for="formProdutoSetor">
+              Setor no Varejo: <span class="text-rose-500">*</span>
+            </label>
+            <select id="formProdutoSetor" class="w-full p-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white font-medium text-slate-800">
+              <option value="Hortifrúti / FLV">Hortifrúti / FLV</option>
+              <option value="Hortifrúti / Ilhas">Hortifrúti / Ilhas</option>
+              <option value="Hortifrúti / Destaque">Hortifrúti / Destaque</option>
+              <option value="Açougue e Peixaria">Açougue e Peixaria</option>
+              <option value="Pontas de Gôndola e Entrada">Pontas de Gôndola e Entrada</option>
+              <option value="Gôndolas e Prateleiras">Gôndolas e Prateleiras</option>
+              <option value="Aéreo e Corredores">Aéreo e Corredores</option>
+              <option value="Acessórios de Fixação">Acessórios de Fixação</option>
+              <option value="Varejo Geral">Varejo Geral</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- DESTAQUE PRINCIPAL: Link Permanente Real Oficial -->
+        <div class="p-3.5 bg-blue-50/70 border border-blue-200 rounded-xl space-y-2">
+          <label class="block font-bold text-blue-900" for="formProdutoLinkPermanente">
+            <i class="fas fa-link text-blue-600 mr-1"></i> Link Permanente Real no Site (URL Oficial do Cadastro): <span class="text-rose-500">*</span>
+          </label>
+          <div class="flex items-center gap-2">
+            <input type="url" id="formProdutoLinkPermanente" class="flex-1 p-2.5 rounded-xl border border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-xs text-blue-950 bg-white" placeholder="https://visualsuper.com.br/produto/...">
+            <button type="button" onclick="testarLinkProdutoModal()" class="px-3 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition shrink-0 cursor-pointer flex items-center gap-1" title="Abre este link no navegador para testar">
+              <i class="fas fa-arrow-up-right-from-square"></i> Testar
+            </button>
+          </div>
+          <p class="text-[11px] text-blue-700 leading-relaxed">
+            💡 <strong>Atenção:</strong> Cole a URL definitiva e permanente do cadastro da Visual Super (ex: <code class="bg-blue-100 text-blue-900 px-1 py-0.5 rounded font-mono">https://visualsuper.com.br/produto/pedestal-com-precificador-e3/</code>). O Treinador usará exatamente este link e nunca gerará uma URL com o título.
+          </p>
+        </div>
+
+        <!-- Preço e Material -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-800 mb-1" for="formProdutoPreco">
+              Preço Médio / Unidade:
+            </label>
+            <input type="text" id="formProdutoPreco" class="w-full p-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-slate-800" placeholder="Ex: R$ 68,00">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-800 mb-1" for="formProdutoMaterial">
+              Material & Medidas:
+            </label>
+            <input type="text" id="formProdutoMaterial" class="w-full p-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-slate-800" placeholder="Ex: Haste telescópica em alumínio + Bolsa A5">
+          </div>
+        </div>
+
+        <!-- Diferencial de Vendas -->
+        <div>
+          <label class="block font-bold text-slate-800 mb-1" for="formProdutoDiferencial">
+            Diferencial Técnico de Venda (Argumento do SDR no WhatsApp):
+          </label>
+          <textarea id="formProdutoDiferencial" rows="2" class="w-full p-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 text-xs" placeholder="Descreva por que esse produto elimina dor do cliente, durabilidade e praticidade..."></textarea>
+        </div>
+      </div>
+
+      <!-- Rodapé do Modal -->
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+        <button type="button" id="btnExcluirProdutoModal" onclick="app.removerProdutoAtualModal()" class="text-xs text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-3 py-2 rounded-xl transition font-semibold hidden cursor-pointer">
+          <i class="fas fa-trash-can mr-1"></i> Excluir do Catálogo
+        </button>
+        <div class="flex items-center gap-2 ml-auto">
+          <button type="button" onclick="fecharModalEditarProduto()" class="text-xs text-slate-500 hover:text-slate-700 font-medium px-4 py-2 cursor-pointer">
+            Cancelar
+          </button>
+          <button type="button" onclick="salvarProdutoModal()" class="text-xs bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-2.5 rounded-xl transition shadow flex items-center gap-1.5 cursor-pointer">
+            <i class="fas fa-save"></i> Salvar no Catálogo
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400">
+    <p>Super Treinador IA - Visual Super (https://visualsuper.com.br/) • Desenvolvido para Onboarding Contínuo do Agente SDR de WhatsApp</p>
+  </footer>
+
+  <!-- SCRIPTS DA APLICAÇÃO -->
+  <script src="./catalogo_produtos.js"></script>
+  <script src="./data.js"></script>
+  <script src="./app.js"></script>
+  <script>
+    // Funções auxiliares de navegação da UI
+    function alternarAbaPrincipal(aba) {
+      document.querySelectorAll("section[id^='secao-']").forEach(sec => sec.classList.add("hidden"));
+      document.querySelectorAll(".tab-principal").forEach(tab => {
+        tab.classList.remove("border-blue-600", "font-bold", "text-blue-600");
+        tab.classList.add("border-transparent", "text-slate-500");
+      });
+
+      const secaoAlvo = document.getElementById(`secao-${aba}`);
+      const tabAlvo = document.getElementById(`tabBtn-${aba}`);
+      if (secaoAlvo) secaoAlvo.classList.remove("hidden");
+      if (tabAlvo) {
+        tabAlvo.classList.add("border-blue-600", "font-bold", "text-blue-600");
+        tabAlvo.classList.remove("border-transparent", "text-slate-500");
+      }
+
+      if (aba === "historico") {
+        app.renderizarHistorico();
+      } else if (aba === "exportador") {
+        app.renderizarExportador();
+      } else if (aba === "crm") {
+        app.atualizarStatusCrmUI();
+      } else if (aba === "chat") {
+        app.iniciarChatSeNecessario();
+      } else if (aba === "configuracoes") {
+        app.renderizarConfiguracoes();
+      }
+    }
+
+    // Modal e Configuração da Chave Gemini
+    function abrirModalConfigIA() {
+      const modal = document.getElementById("modalConfigIA");
+      const input = document.getElementById("inputGeminiApiKey");
+      const statusSalvo = document.getElementById("statusSalvoModal");
+      const btnRemover = document.getElementById("btnRemoverChave");
+      const resultado = document.getElementById("resultadoTesteConexao");
+
+      resultado.classList.add("hidden");
+      const chaveAtual = app.obterChaveGemini();
+      if (chaveAtual) {
+        input.value = chaveAtual;
+        statusSalvo.innerHTML = `<span class="text-emerald-600 font-bold">✓ Chave salva</span>`;
+        btnRemover.classList.remove("hidden");
+      } else {
+        input.value = "";
+        statusSalvo.innerHTML = `<span class="text-slate-400">Não configurada</span>`;
+        btnRemover.classList.add("hidden");
+      }
+
+      modal.classList.remove("hidden");
+      setTimeout(() => input.focus(), 100);
+    }
+
+    function fecharModalConfigIA() {
+      document.getElementById("modalConfigIA").classList.add("hidden");
+    }
+
+    function fecharModalConversa() {
+      document.getElementById("modalVisualizarConversa").classList.add("hidden");
+    }
+
+    function alternarVisibilidadeChave() {
+      const input = document.getElementById("inputGeminiApiKey");
+      const icone = document.getElementById("iconeOlhoChave");
+      if (input.type === "password") {
+        input.type = "text";
+        icone.classList.remove("fa-eye");
+        icone.classList.add("fa-eye-slash");
+      } else {
+        input.type = "password";
+        icone.classList.remove("fa-eye-slash");
+        icone.classList.add("fa-eye");
+      }
+    }
+
+    async function salvarChaveGeminiModal() {
+      const input = document.getElementById("inputGeminiApiKey");
+      const chave = input.value.trim();
+      if (!chave) {
+        alert("Por favor, cole sua chave de API antes de salvar!");
+        return;
+      }
+      app.salvarChaveGemini(chave);
+      fecharModalConfigIA();
+      app.mostrarToast("🔑 Chave Gemini salva com sucesso! IA Ativada.");
+    }
+
+    async function removerChaveGeminiModal() {
+      if (confirm("Deseja realmente remover a chave de API Gemini do navegador?")) {
+        app.removerChaveGemini();
+        document.getElementById("inputGeminiApiKey").value = "";
+        document.getElementById("statusSalvoModal").innerHTML = `<span class="text-slate-400">Removida</span>`;
+        document.getElementById("btnRemoverChave").classList.add("hidden");
+        document.getElementById("resultadoTesteConexao").classList.add("hidden");
+        app.mostrarToast("🗑️ Chave Gemini removida. Sistema voltou ao modo local.");
+      }
+    }
+
+    async function testarChaveGeminiModal() {
+      const input = document.getElementById("inputGeminiApiKey");
+      const resultado = document.getElementById("resultadoTesteConexao");
+      const btn = document.getElementById("btnTestarChave");
+      const chave = input.value.trim();
+
+      if (!chave) {
+        resultado.className = "p-3 rounded-xl text-xs font-medium border bg-amber-50 border-amber-200 text-amber-800";
+        resultado.innerHTML = "Por favor, digite ou cole uma chave para testar.";
+        resultado.classList.remove("hidden");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Testando...`;
+      resultado.className = "p-3 rounded-xl text-xs font-medium border bg-blue-50 border-blue-200 text-blue-800";
+      resultado.innerHTML = "Conectando ao Google Gemini API...";
+      resultado.classList.remove("hidden");
+
+      const teste = await app.testarConexaoGemini(chave);
+      btn.disabled = false;
+      btn.innerHTML = `<i class="fas fa-vial"></i> Testar Conexão`;
+
+      if (teste.sucesso) {
+        resultado.className = "p-3 rounded-xl text-xs font-medium border bg-emerald-50 border-emerald-200 text-emerald-800";
+        resultado.innerHTML = `✅ Conexão estabelecida com sucesso! Modelo ${teste.modelo} respondeu perfeitamente.`;
+      } else {
+        resultado.className = "p-3 rounded-xl text-xs font-medium border bg-rose-50 border-rose-200 text-rose-800";
+        resultado.innerHTML = `❌ Erro de conexão: ${teste.erro}`;
+      }
+    }
+
+    async function acionarGerador() {
+      const input = document.getElementById("inputPerguntaLead");
+      if (!input.value.trim()) {
+        alert("Por favor, digite a pergunta do lead antes de gerar!");
+        return;
+      }
+      await app.gerarAlternativas(input.value.trim());
+      app.renderizarAlternativas();
+    }
+
+    function carregarExemploRapido(texto) {
+      document.getElementById("inputPerguntaLead").value = texto;
+      acionarGerador();
+    }
+
+    function carregarExemploClipStrip() {
+      const texto = "Qual o preço\nCLIP STRIP BRANCO PRESILHA 1200 x 35 x 1,00 mm COM\nTESTEIRO 100 x 70 mm\n24 posições expositoras 100 unidades";
+      document.getElementById("inputPerguntaLead").value = texto;
+      document.getElementById("inputLinkProdutoLead").value = "https://visualsuper.com.br/produto/fita-cross-clip-strip-branca-24-posicoes/";
+      const inputObs = document.getElementById("inputObservacaoProdutoLead");
+      if (inputObs) {
+        inputObs.value = "Temos tanto a fita cross de 13 posições quanto a de 24 posições. Testeira personalizável com o logotipo do cliente e desconto progressivo a partir de 100 unidades.";
+      }
+      app.acionarAprendizadoLink();
+    }
+
+    function aplicarFiltroHistorico() {
+      const setor = document.getElementById("filtroSetorHistorico").value;
+      const busca = document.getElementById("buscaHistorico").value;
+      app.renderizarHistorico(setor, busca);
+    }
+
+    // Modal de Cadastro e Edição de Link Permanente de Produto
+    function fecharModalEditarProduto() {
+      document.getElementById("modalEditarProduto").classList.add("hidden");
+    }
+
+    function testarLinkProdutoModal() {
+      const url = document.getElementById("formProdutoLinkPermanente").value.trim();
+      if (!url) {
+        alert("Por favor, preencha o link permanente antes de testar!");
+        return;
+      }
+      window.open(url, "_blank");
+    }
+
+    function salvarProdutoModal() {
+      const id = document.getElementById("formProdutoId").value.trim();
+      const nome = document.getElementById("formProdutoNome").value.trim();
+      const sku = document.getElementById("formProdutoSku").value.trim();
+      const setor = document.getElementById("formProdutoSetor").value;
+      const linkPermanente = document.getElementById("formProdutoLinkPermanente").value.trim();
+      const preco = document.getElementById("formProdutoPreco").value.trim();
+      const material = document.getElementById("formProdutoMaterial").value.trim();
+      const diferencial = document.getElementById("formProdutoDiferencial").value.trim();
+
+      if (!nome) {
+        alert("Por favor, preencha o nome do produto!");
+        document.getElementById("formProdutoNome").focus();
+        return;
+      }
+
+      if (!linkPermanente || !linkPermanente.startsWith("http")) {
+        alert("Por favor, preencha uma URL válida de Link Permanente (iniciando com http:// ou https://)!");
+        document.getElementById("formProdutoLinkPermanente").focus();
+        return;
+      }
+
+      app.salvarProdutoForm({
+        id: id || ("PROD-" + Date.now()),
+        nome,
+        sku: sku || "VS-000",
+        setor,
+        link_permanente: linkPermanente,
+        link: linkPermanente,
+        preco_medio: preco || "Sob consulta",
+        material: material || "Material resistente Visual Super",
+        medidas: "Padrão PDV",
+        diferencial: diferencial || "Solução profissional de alta durabilidade para o ponto de venda."
+      });
+
+      fecharModalEditarProduto();
+    }
+  </script>
+</body>
+</html>

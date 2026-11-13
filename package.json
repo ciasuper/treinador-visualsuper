@@ -1,0 +1,12 @@
+{
+  "name": "treinador-visualsuper",
+  "private": true,
+  "version": "2.0.0",
+  "description": "Super Treinador SDR - Visual Super",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {}
+}

@@ -1,0 +1,5 @@
+node_modules/
+scratch/
+data/database.json.tmp
+*.log
+.DS_Store
